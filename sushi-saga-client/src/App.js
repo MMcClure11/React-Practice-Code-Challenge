@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import SushiContainer from './containers/SushiContainer';
 import Table from './containers/Table';
+import SushiWallet from './components/SushiWallet'
 
 // Endpoint!
 const API = "http://localhost:3000/sushis"
@@ -25,7 +26,11 @@ class App extends Component {
   }
 
   moreSushis = () => {
+    if (this.state.index >= this.state.sushis.length - 4) {
+      this.setState({index: 0})
+    } else {
     this.setState(prevState => ({index: prevState.index + 4}))
+    }
   }
 
   eatSushi = (sushi) => {
@@ -36,6 +41,9 @@ class App extends Component {
     }
   }
 
+  updateBudget = (money) => {
+    this.setState(prevState => ({budget: prevState.budget + parseInt(money)}))
+  }
 
   render() {
     return (
@@ -47,6 +55,7 @@ class App extends Component {
           eaten={this.state.eaten}
           />
         <Table eaten={this.state.eaten} budget={this.state.budget}/>
+        <SushiWallet updateBudget={this.updateBudget}/>
       </div>
     );
   }
