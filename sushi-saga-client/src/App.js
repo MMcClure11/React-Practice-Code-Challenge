@@ -7,54 +7,46 @@ const API = "http://localhost:3000/sushis"
 
 class App extends Component {
 
-  constructor(){
-    super();
-    this.state={
-      sushis:[],
-      sushiIndex: 0,
-      allowance: 100,
-      eatenSushi:[]
+  state = {
+    sushis: [],
+    index: 0,
+    eaten: [],
+    budget: 100,
+  }
+
+  componentDidMount() {
+    fetch(API)
+      .then(response => response.json())
+      .then(data => this.setState({sushis: data}));
+  }
+
+  fourSushis = () => { 
+    return this.state.sushis.slice(this.state.index, this.state.index + 4)
+  }
+
+  moreSushis = () => {
+    this.setState(prevState => ({index: prevState.index + 4}))
+  }
+
+  eatSushi = (sushi) => {
+    if (this.state.budget >= sushi.price) {
+      this.setState(prevState => ({eaten: [...prevState.eaten, sushi],
+        budget: prevState.budget - sushi.price     
+      }))
     }
   }
 
-componentDidMount(){
-  fetch(API)
-  .then(resp => resp.json())
-  .then(sushis => {this.setState({sushis})})
-}
-
-eatSushi = (sushi) => {
-  const newAllowance = this.state.allowance - sushi.price
-
-  if(!this.state.eatenSushi.includes(sushi) && newAllowance >= 0){
-    this.setState({
-      eatenSushi: [...this.state.eatenSushi, sushi],
-      allowance: newAllowance
-    })
-  }
-}
-
-grabSushi = () => {
-  return this.state.sushis.slice(this.state.sushiIndex, this.state.sushiIndex+4)
-}
-
-moreSushis = () => {
-  this.setState({
-    sushiIndex: this.state.sushiIndex+4
-  })
-}
 
   render() {
     return (
       <div className="app">
-        <SushiContainer
-          sushis={this.grabSushi()}
+        <SushiContainer 
+          fourSushis={this.fourSushis()} 
+          moreSushis={this.moreSushis} 
           eatSushi={this.eatSushi}
-          eatenSushi={this.state.eatenSushi}
-          moreSushis={this.moreSushis} />
-        <Table
-          allowance={this.state.allowance}
-          eatenSushi={this.state.eatenSushi} />
+          eaten={this.state.eaten}
+          />
+        <Table eaten={this.state.eaten} budget={this.state.budget}/>
       </div>
     );
   }
